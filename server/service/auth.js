@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 
 const { findUserByProperty,createNewUser, } = require("./user");
 const error = require('../utils/error');
-const { status } = require("express/lib/response");
 
 const registerService = async ({name,email,password})=>{
     let user = await findUserByProperty('email',email)
