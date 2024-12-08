@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const userService = require('../service/user')
 const error = require('../utils/error')
+const authService = require('../service/auth')
 
 const getUsers = async (req, res, next) => {
     /**
@@ -16,7 +17,7 @@ const getUsers = async (req, res, next) => {
 };
 
 const getUserById = async (req, res, next) => {
-    const userId = req.params.userId
+    const {userId} = req.params
     try{
         const user = await userService.findUserByProperty('_id',userId)
 
@@ -31,13 +32,57 @@ const getUserById = async (req, res, next) => {
     }
 };
 
-const postUser = (req, res, next) => {};
+const postUser = async (req, res, next) => {
+    const { name, email, password, roles, accountStatus, } = req.body
+    try {
+       const user =  await authService.registerService({ name, email, password, roles, accountStatus })
+       return res.status(201).json(user)
+    } catch (e) {
+        next(e)
+    }
+
+};
 
 const putUserById = (req, res, next) => {};
 
-const patchUserById = (req, res, next) => {};
+const patchUserById = async (req, res, next) => {
+    const {userId} = req.params
+    const{name,roles,accountStatus} = req.body
+    
 
-const deleteUserById = (req, res, next) => {};
+    try {
+        
+        const user = await userService.findUserByProperty('_id', userId)
+        if(!user){
+            throw error('User Not Found',404)
+        }
+
+        user.name = name ?? user.name
+        user.roles = roles ?? user.roles
+        user.accountStatus = accountStatus ?? user.accountStatus
+
+        await user.save()
+        return res.status(200).json(user)
+    } catch (e) {
+        next(e)
+    }
+};
+
+
+const deleteUserById = async (req, res, next) => {
+    const {userId} = req.params
+    try {
+        const user = await userService.findUserByProperty('_id', userId)
+        if(!user){
+            throw error ('User Not Found', 404)
+        }
+
+        await user.deleteOne()
+        return res.status(203).send()
+    } catch (e) {
+        next(e)
+    }
+};
 
 
 
