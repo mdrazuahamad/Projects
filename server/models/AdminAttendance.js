@@ -1,10 +1,23 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model } = require("mongoose");
 
-const adminAttendanceSchema = new Schema({
-    timeLimit: Number,
-    status: String,
-    creatAt: Date
-})
-const AdminAttendance = model ('AdminAttendance', adminAttendanceSchema);
+const adminAttendanceSchema = new Schema(
+  {
+    timeLimit: {
+      type: Number,
+      require: true,
+      max: 30,
+      min: 1,
+      default: 5,
+    },
+    status: {
+      type: String,
+      require: true,
+      enum: ["RUNNING", "COMPLETED"],
+      default: "RUNNING",
+    },
+  },
+  { timestamps: true }
+);
+const AdminAttendance = model("AdminAttendance", adminAttendanceSchema);
 
-module.exports = AdminAttendance
+module.exports = AdminAttendance;
